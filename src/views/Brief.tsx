@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { SECTIONS, type Contest, type Criterion, type Item } from '../../shared/types'
 import { checkAll, indexText, type Checked } from '../../shared/verify'
-import { useSettings } from '../store'
+import { progress } from '../progress'
+import { setDismissed, setTicked, useSettings } from '../store'
 import { DeadlineHeader } from './DeadlineHeader'
 import { RulesPane, type Mark } from './RulesPane'
 
@@ -18,7 +19,7 @@ function useWide(): boolean {
   return wide
 }
 
-export function Brief({ contest, onHome }: { contest: Contest; onHome: () => void }) {
+export function Brief({ contest }: { contest: Contest }) {
   const { reading } = contest
   const [settings] = useSettings()
   const ix = useMemo(() => indexText(contest.text), [contest.text])
@@ -34,7 +35,9 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
   }, [items, dates, judging])
   const provenKeys = useMemo(() => new Set(marks.map((m) => m.key)), [marks])
   const proven = items.filter((i) => i.span)
-  const unproven = items.filter((i) => !i.span)
+  const unproven = items.filter((i) => !i.span && !contest.dismissed.includes(i.index))
+  const ticked = new Set(contest.ticked)
+  const { done, total } = progress(contest)
   const [selected, setSelected] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const wide = useWide()
@@ -57,17 +60,28 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
   return (
     <div className="brief">
       <header className="masthead">
-        <button className="wordmark link" onClick={onHome}>
+        <a className="wordmark link" href="#/">
           Ruleproof
-        </button>
+        </a>
+        <a className="back" href="#/">
+          Your contests
+        </a>
       </header>
       <div className="brief-grid">
         <main className="brief-main">
           <h1 className="contest-name">{reading.contest || 'Untitled contest'}</h1>
           <DeadlineHeader contest={contest} zone={settings.zone} isProven={(k) => provenKeys.has(k)} onSelect={select} />
-          <p className="tally">
-            {proven.length} of {items.length} items found word for word in the rules
-          </p>
+          <div className="progress-line" aria-live="polite">
+            <span className="bar">
+              <span style={{ width: `${total ? (100 * done) / total : 0}%` }} />
+            </span>
+            <span>
+              {done} of {total} done
+            </span>
+            <span className="tally">
+              {proven.length} of {items.length} items found word for word in the rules
+            </span>
+          </div>
           {SECTIONS.map(({ key, title }) => {
             const list = proven.filter((i) => i.value.section === key)
             if (!list.length) return null
@@ -76,7 +90,14 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
                 <h2>{title}</h2>
                 <ul>
                   {list.map((c) => (
-                    <ItemRow key={c.index} c={c} selected={selected === `i${c.index}`} onSelect={select} />
+                    <ItemRow
+                      key={c.index}
+                      c={c}
+                      selected={selected === `i${c.index}`}
+                      onSelect={select}
+                      ticked={ticked.has(c.index)}
+                      onTick={(on) => setTicked(contest.id, c.index, on)}
+                    />
                   ))}
                 </ul>
               </section>
@@ -98,7 +119,7 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
               <p className="note">The rules don&rsquo;t say these word for word. Check before you rely on them.</p>
               <ul>
                 {unproven.map((c) => (
-                  <ItemRow key={c.index} c={c} selected={false} />
+                  <ItemRow key={c.index} c={c} selected={false} onDismiss={() => setDismissed(contest.id, c.index, true)} />
                 ))}
               </ul>
             </section>
@@ -132,13 +153,44 @@ function Proof({ quote, found, onClick }: { quote: string; found: boolean; onCli
   )
 }
 
-function ItemRow({ c, selected, onSelect }: { c: Checked<Item>; selected: boolean; onSelect?: (key: string) => void }) {
+function ItemRow({
+  c,
+  selected,
+  onSelect,
+  ticked,
+  onTick,
+  onDismiss,
+}: {
+  c: Checked<Item>
+  selected: boolean
+  onSelect?: (key: string) => void
+  ticked?: boolean
+  onTick?: (on: boolean) => void
+  onDismiss?: () => void
+}) {
   const key = `i${c.index}`
   return (
-    <li id={`entry-${key}`} className={`item${selected ? ' selected' : ''}`}>
-      <div className="item-title">{c.value.title}</div>
-      {c.value.detail && <div className="item-detail">{c.value.detail}</div>}
-      <Proof quote={c.value.quote} found={Boolean(c.span)} onClick={() => onSelect?.(key)} />
+    <li id={`entry-${key}`} className={`item${selected ? ' selected' : ''}${ticked ? ' ticked' : ''}`}>
+      {onTick && (
+        <label className="tick">
+          <input type="checkbox" checked={Boolean(ticked)} onChange={(e) => onTick(e.target.checked)} aria-label={c.value.title} />
+          <span className="box" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path d="M3.5 8.5l3 3 6-7" />
+            </svg>
+          </span>
+        </label>
+      )}
+      <div className="item-body">
+        <div className="item-title">{c.value.title}</div>
+        {c.value.detail && <div className="item-detail">{c.value.detail}</div>}
+        <Proof quote={c.value.quote} found={Boolean(c.span)} onClick={() => onSelect?.(key)} />
+        {onDismiss && (
+          <button className="dismiss" onClick={onDismiss}>
+            Dismiss
+          </button>
+        )}
+      </div>
     </li>
   )
 }
@@ -147,11 +199,13 @@ function CriterionRow({ c, selected, onSelect }: { c: Checked<Criterion>; select
   const key = `j${c.index}`
   return (
     <li id={`entry-${key}`} className={`item criterion${selected ? ' selected' : ''}`}>
-      <div className="item-title">
-        {c.value.name}
-        {c.value.weight && <span className="weight">{c.value.weight}</span>}
+      <div className="item-body">
+        <div className="item-title">
+          {c.value.name}
+          {c.value.weight && <span className="weight">{c.value.weight}</span>}
+        </div>
+        <Proof quote={c.value.quote} found={Boolean(c.span)} onClick={() => onSelect(key)} />
       </div>
-      <Proof quote={c.value.quote} found={Boolean(c.span)} onClick={() => onSelect(key)} />
     </li>
   )
 }

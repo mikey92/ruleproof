@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Open a brief, read the due time, switch the zone to Seoul and back, and download the calendar file.
   Commit: `Show deadlines in the reader's time with countdown and calendar file`
 
-- [ ] **4. Ticks and contests survive a reload**
+- [x] **4. Ticks and contests survive a reload**
   Becomes usable: Ticking items updates the progress and is saved; the home page lists saved contests by soonest deadline with countdowns and progress; contests can be deleted; the same rules twice open the same contest.
   Why now: Turns a one-off reading into the core loop of coming back; needs the brief and deadlines in place to list them.
   PRD ref: `prd.md > Checklist and Progress`, `prd.md > Your Contests`

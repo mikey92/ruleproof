@@ -8,7 +8,7 @@
     "run_worker_first": ["/api/*"]
   },
   // Readings by fingerprint of the rules text, so the same rules are read by the AI once.
-  "kv_namespaces": [{ "binding": "READINGS", "id": "ruleproof-readings-local" }],
+  "kv_namespaces": [{ "binding": "READINGS", "id": "deae51f8572f44ed9fd10ebd0e18e1c4" }],
   // Per visitor IP: keeps one browser from spending the reader's capacity.
   "ratelimits": [
     { "name": "READ_LIMIT", "namespace_id": "4201", "simple": { "limit": 6, "period": 60 } },

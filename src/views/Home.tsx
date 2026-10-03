@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { tidyRules } from '../../shared/text'
 import { MAX_RULES_CHARS, MIN_RULES_CHARS, type Contest } from '../../shared/types'
 import { ApiError, readRules } from '../api'
+import { ZonePicker } from './ZonePicker'
 
 async function contestId(text: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
@@ -76,6 +77,7 @@ export function Home({ onRead }: { onRead: (c: Contest) => void }) {
           spellCheck={false}
         />
         <div className="actions">
+          <ZonePicker />
           <button className="primary" onClick={check} disabled={busy}>
             {busy ? 'Reading…' : 'Check the rules'}
           </button>

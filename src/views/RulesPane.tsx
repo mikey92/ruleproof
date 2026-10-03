@@ -2,16 +2,16 @@ import { useEffect, useMemo, useRef } from 'react'
 import type { Span } from '../../shared/verify'
 
 export interface Mark {
-  /** Index of the item the quote belongs to */
-  index: number
+  /** What the quote belongs to: "i3" (item), "d0" (date) or "j1" (judging criterion) */
+  key: string
   span: Span
 }
 
 interface Segment {
   start: number
   end: number
-  /** Items whose quote covers this stretch of text */
-  items: number[]
+  /** Keys whose quote covers this stretch of text */
+  keys: string[]
 }
 
 /** Cuts the text at every quote boundary, so overlapping quotes can each be highlighted. */
@@ -27,8 +27,8 @@ function segments(length: number, marks: Mark[]): Segment[] {
     const start = points[i]
     const end = points[i + 1]
     if (end <= start) continue
-    const items = marks.filter((m) => m.span.start <= start && m.span.end >= end).map((m) => m.index)
-    out.push({ start, end, items })
+    const keys = marks.filter((m) => m.span.start <= start && m.span.end >= end).map((m) => m.key)
+    out.push({ start, end, keys })
   }
   return out
 }
@@ -42,8 +42,8 @@ export function RulesPane({
 }: {
   text: string
   marks: Mark[]
-  selected: number | null
-  onSelect: (index: number) => void
+  selected: string | null
+  onSelect: (key: string) => void
   sourceUrl?: string
 }) {
   const pane = useRef<HTMLDivElement>(null)
@@ -62,7 +62,7 @@ export function RulesPane({
     shown.current = true
   }, [selected])
 
-  const firstSeen = new Set<number>()
+  const firstSeen = new Set<string>()
   return (
     <div className="rules" ref={pane}>
       <div className="rules-head">
@@ -76,18 +76,18 @@ export function RulesPane({
       <div className="rules-text">
         {parts.map((p) => {
           const chunk = text.slice(p.start, p.end)
-          if (!p.items.length) return <span key={p.start}>{chunk}</span>
-          // The items whose quote starts in this segment, so the pane can scroll to the start of each quote.
-          const first = p.items.filter((i) => !firstSeen.has(i))
-          first.forEach((i) => firstSeen.add(i))
-          const on = selected !== null && p.items.includes(selected)
+          if (!p.keys.length) return <span key={p.start}>{chunk}</span>
+          // The quotes that start in this segment, so the pane can scroll to the start of each one.
+          const first = p.keys.filter((k) => !firstSeen.has(k))
+          first.forEach((k) => firstSeen.add(k))
+          const on = selected !== null && p.keys.includes(selected)
           return (
             <mark
               key={p.start}
               className={on ? 'on' : undefined}
-              data-items={p.items.join(' ')}
+              data-keys={p.keys.join(' ')}
               data-first={first.length ? first.join(' ') : undefined}
-              onClick={() => onSelect(p.items.includes(selected ?? -1) ? selected! : p.items[0])}
+              onClick={() => onSelect(on ? selected! : p.keys[0])}
             >
               {chunk}
             </mark>

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { SECTIONS, type Contest, type Item } from '../../shared/types'
+import { SECTIONS, type Contest, type Criterion, type Item } from '../../shared/types'
 import { checkAll, indexText, type Checked } from '../../shared/verify'
+import { useSettings } from '../store'
+import { DeadlineHeader } from './DeadlineHeader'
 import { RulesPane, type Mark } from './RulesPane'
 
 const WIDE = '(min-width: 1024px)'
@@ -18,34 +20,38 @@ function useWide(): boolean {
 
 export function Brief({ contest, onHome }: { contest: Contest; onHome: () => void }) {
   const { reading } = contest
+  const [settings] = useSettings()
   const ix = useMemo(() => indexText(contest.text), [contest.text])
   const items = useMemo(() => checkAll(ix, reading.items), [ix, reading.items])
-  const marks = useMemo<Mark[]>(() => items.flatMap((c) => (c.span ? [{ index: c.index, span: c.span }] : [])), [items])
+  const dates = useMemo(() => checkAll(ix, reading.deadlines), [ix, reading.deadlines])
+  const judging = useMemo(() => checkAll(ix, reading.judging), [ix, reading.judging])
+  const marks = useMemo<Mark[]>(() => {
+    const out: Mark[] = []
+    for (const [prefix, list] of [['i', items], ['d', dates], ['j', judging]] as const) {
+      for (const c of list) if (c.span) out.push({ key: `${prefix}${c.index}`, span: c.span })
+    }
+    return out
+  }, [items, dates, judging])
+  const provenKeys = useMemo(() => new Set(marks.map((m) => m.key)), [marks])
   const proven = items.filter((i) => i.span)
   const unproven = items.filter((i) => !i.span)
-  const [selected, setSelected] = useState<number | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const wide = useWide()
 
-  function select(index: number) {
-    setSelected(index)
+  function select(key: string) {
+    setSelected(key)
     if (!wide) setSheetOpen(true)
   }
 
-  // A highlight clicked in the rules brings its item into view in the checklist.
-  function selectFromRules(index: number) {
-    setSelected(index)
-    document.getElementById(`item-${index}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  // A highlight clicked in the rules brings its entry into view in the checklist.
+  function selectFromRules(key: string) {
+    setSelected(key)
+    document.getElementById(`entry-${key}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }
 
   const pane = (
-    <RulesPane
-      text={contest.text}
-      marks={marks}
-      selected={selected}
-      onSelect={selectFromRules}
-      sourceUrl={contest.source.url}
-    />
+    <RulesPane text={contest.text} marks={marks} selected={selected} onSelect={selectFromRules} sourceUrl={contest.source.url} />
   )
 
   return (
@@ -58,6 +64,7 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
       <div className="brief-grid">
         <main className="brief-main">
           <h1 className="contest-name">{reading.contest || 'Untitled contest'}</h1>
+          <DeadlineHeader contest={contest} zone={settings.zone} isProven={(k) => provenKeys.has(k)} onSelect={select} />
           <p className="tally">
             {proven.length} of {items.length} items found word for word in the rules
           </p>
@@ -69,12 +76,22 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
                 <h2>{title}</h2>
                 <ul>
                   {list.map((c) => (
-                    <ItemRow key={c.index} c={c} selected={selected === c.index} onSelect={select} />
+                    <ItemRow key={c.index} c={c} selected={selected === `i${c.index}`} onSelect={select} />
                   ))}
                 </ul>
               </section>
             )
           })}
+          {judging.length > 0 && (
+            <section className="group judging">
+              <h2>How it&rsquo;s judged</h2>
+              <ul>
+                {judging.map((c) => (
+                  <CriterionRow key={c.index} c={c} selected={selected === `j${c.index}`} onSelect={select} />
+                ))}
+              </ul>
+            </section>
+          )}
           {unproven.length > 0 && (
             <section className="group unproven">
               <h2>Not found in the rules</h2>
@@ -101,23 +118,40 @@ export function Brief({ contest, onHome }: { contest: Contest; onHome: () => voi
   )
 }
 
-function ItemRow({ c, selected, onSelect }: { c: Checked<Item>; selected: boolean; onSelect?: (index: number) => void }) {
-  const proven = Boolean(c.span)
+function Proof({ quote, found, onClick }: { quote: string; found: boolean; onClick?: () => void }) {
+  return found ? (
+    <button className="proof found" onClick={onClick} aria-label={`Show in the rules: ${quote}`}>
+      <span className="proof-status">In the rules</span>
+      <q>{quote}</q>
+    </button>
+  ) : (
+    <div className="proof missing">
+      <span className="proof-status">Not found in the rules</span>
+      <q>{quote}</q>
+    </div>
+  )
+}
+
+function ItemRow({ c, selected, onSelect }: { c: Checked<Item>; selected: boolean; onSelect?: (key: string) => void }) {
+  const key = `i${c.index}`
   return (
-    <li id={`item-${c.index}`} className={`item${selected ? ' selected' : ''}`}>
+    <li id={`entry-${key}`} className={`item${selected ? ' selected' : ''}`}>
       <div className="item-title">{c.value.title}</div>
       {c.value.detail && <div className="item-detail">{c.value.detail}</div>}
-      {proven ? (
-        <button className="proof found" onClick={() => onSelect?.(c.index)} aria-label={`Show in the rules: ${c.value.quote}`}>
-          <span className="proof-status">In the rules</span>
-          <q>{c.value.quote}</q>
-        </button>
-      ) : (
-        <div className="proof missing">
-          <span className="proof-status">Not found in the rules</span>
-          <q>{c.value.quote}</q>
-        </div>
-      )}
+      <Proof quote={c.value.quote} found={Boolean(c.span)} onClick={() => onSelect?.(key)} />
+    </li>
+  )
+}
+
+function CriterionRow({ c, selected, onSelect }: { c: Checked<Criterion>; selected: boolean; onSelect: (key: string) => void }) {
+  const key = `j${c.index}`
+  return (
+    <li id={`entry-${key}`} className={`item criterion${selected ? ' selected' : ''}`}>
+      <div className="item-title">
+        {c.value.name}
+        {c.value.weight && <span className="weight">{c.value.weight}</span>}
+      </div>
+      <Proof quote={c.value.quote} found={Boolean(c.span)} onClick={() => onSelect(key)} />
     </li>
   )
 }

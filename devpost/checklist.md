@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Open a brief, click three items and one highlight, and see the rules jump to the right sentence each time.
   Commit: `Show the rules beside the checklist with linked highlights`
 
-- [ ] **3. The deadline shows in your own time, with a countdown and a calendar file**
+- [x] **3. The deadline shows in your own time, with a countdown and a calendar file**
   Becomes usable: The brief header shows the submission deadline in the reader's zone with the rules' wording quoted, a live countdown, the other key dates, and Add to calendar; the zone can be changed on the home page.
   Why now: The second half of "what do I do and by when"; depends only on the reading format from slice 1.
   PRD ref: `prd.md > Deadline in Your Time`
@@ -98,3 +98,5 @@ Activity mode:
 - Slices 1 and 2 were built in one pass and share one commit — the rules pane was written while the first readings ran.
 - The phone sheet opens straight at the passage instead of gliding from the top — the glide from the top was slow enough that the passage was still off screen when the sheet appeared.
 - A segment where two quotes start together now anchors both — previously only the first item could scroll to it.
+- Dates and judging criteria are highlighted in the rules too, so marks are keyed by kind ("i3", "d0", "j1") instead of item number — the deadline's own quote is proof and should be one click from its sentence like any item. The "How it's judged" group landed in this slice for the same reason.
+- The zone setting is saved in the browser already in slice 3 (`src/store.ts`) — switching zones and coming back should not reset it; slice 4 adds contests to the same store.

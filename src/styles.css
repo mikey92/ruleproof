@@ -416,3 +416,145 @@ button.proof:hover q {
   color: var(--muted);
   margin: 0 0 6px;
 }
+
+/* Deadline header: a departures board */
+.due {
+  margin: 18px 0 8px;
+  padding: 18px 20px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--ink);
+  border-radius: var(--r);
+}
+
+.due-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font: 500 12px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--due);
+}
+
+.due-time {
+  font: 500 34px/1.15 var(--mono);
+  letter-spacing: -0.02em;
+  margin: 10px 0 4px;
+}
+
+.due-time.closed {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.countdown {
+  font: 500 15px/1.4 var(--mono);
+  color: var(--ink);
+}
+
+.countdown.urgent {
+  color: var(--due);
+}
+
+.caveat {
+  margin-top: 6px;
+  font: 13px/1.4 var(--mono);
+  color: var(--warn);
+}
+
+.due-quote {
+  margin-top: 12px;
+}
+
+.due-quote:disabled {
+  cursor: default;
+}
+
+.due-actions {
+  margin-top: 14px;
+}
+
+.secondary {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--r);
+  padding: 8px 14px;
+  font: 500 14px/1 var(--sans);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--paper);
+}
+
+.secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.other-dates {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.other-dates li + li {
+  margin-top: 4px;
+}
+
+.link-like {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  width: 100%;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: 13px/1.45 var(--mono);
+}
+
+.link-like:hover:not(:disabled) .other-label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-like:disabled {
+  cursor: default;
+}
+
+.other-label {
+  color: var(--muted);
+  min-width: 13em;
+}
+
+.zone-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 13px/1 var(--mono);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.zone-picker select {
+  max-width: 15em;
+  padding: 5px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: var(--card);
+  font: 13px/1 var(--mono);
+  color: var(--ink);
+}
+
+.weight {
+  margin-left: 10px;
+  font: 12px/1 var(--mono);
+  color: var(--muted);
+}

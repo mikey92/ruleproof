@@ -11,7 +11,9 @@ An AI reads the rules, and it is good at finding requirements in 500 lines of le
 - **In the rules**: the quote was found. Click the item and the rules beside the checklist scroll to the sentence and highlight it.
 - **Not found in the rules**: the quote wasn't found word for word. The item is set apart with its claimed quote, can't be ticked, and can be dismissed. An invented requirement never passes as a real one.
 
-Matching ignores only differences that never change meaning: letter case, spacing and line breaks, curly versus straight quote marks, dash styles, list bullets and invisible characters. Nothing fuzzier, because a near miss is exactly what an invented requirement looks like. On three real rules pages (Build With AI: Basics, IEEE ClimateChain, PayPal AI Hackathon), every quote the reader returned matched.
+Matching ignores only differences that never change meaning: letter case, spacing and line breaks, curly versus straight quote marks, dash styles, list bullets and invisible characters. Nothing fuzzier, because a near miss is exactly what an invented requirement looks like. A quote under 15 characters never counts: a heading is not proof.
+
+On five real rules pages read through the live app (Build With AI: Basics, IEEE ClimateChain, PayPal AI Hackathon, Nebius x NVIDIA, YouCam), 105 of 106 checklist items were proven word for word. The one that wasn't, "Fit one hackathon track" on the Nebius page, was backed only by the heading "Tracks:", so Ruleproof set it apart instead of passing it off as proven.
 
 Deadlines get the same treatment: the AI reports the date, time and zone *as the rules state them*, and Luxon turns them into an exact moment shown in your zone (with daylight saving handled). If the rules give no time zone or no time, Ruleproof says so instead of guessing.
 

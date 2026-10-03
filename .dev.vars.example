@@ -1,0 +1,11 @@
+# Copy to .dev.vars and set ONE of the two options. Never commit .dev.vars.
+
+# Option 1: an OpenAI API key (Responses API)
+OPENAI_API_KEY=sk-your-key
+
+# Option 2: a relay that forwards Responses calls (see README)
+# LLM_RELAY_URL=https://your-relay-host
+# LLM_RELAY_KEY=your-relay-key
+
+# Optional: the model to use (default gpt-5.5)
+# LLM_MODEL=gpt-5.5

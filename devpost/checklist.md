@@ -9,7 +9,7 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. Paste the rules and get a checklist where every item shows its proof**
+- [x] **1. Paste the rules and get a checklist where every item shows its proof**
   Becomes usable: A running app where pasted rules come back as checklist items grouped as Submit, Build, Can you enter? and Watch out, each marked "In the rules" or set apart under "Not found in the rules".
   Why now: This is the kernel and the biggest unknown (will the AI's quotes match the rules exactly?), so it goes first, with the project scaffold folded in.
   PRD ref: `prd.md > Reading the Rules`, `prd.md > Proof for Every Item`
@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Paste the Build With AI: Basics rules, press Check the rules, and see the grouped items with "In the rules" on each.
   Commit: `Read pasted rules into a checklist with verified quotes`
 
-- [ ] **2. Click any item to see its sentence lit up in the rules**
+- [x] **2. Click any item to see its sentence lit up in the rules**
   Becomes usable: The brief shows the rules beside the checklist; every proven quote is highlighted, clicking an item scrolls to its sentence and marks it, and clicking a highlight selects its item. On a phone the rules open as a sheet.
   Why now: Completes the kernel's visible half while the reading format is fresh; everything after builds around this two-pane layout.
   PRD ref: `prd.md > Proof for Every Item`, `prd.md > Screens and Layout`
@@ -71,7 +71,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 2 (the kernel is visible end to end)
+- [x] Early usable behavior explored — after slice 2 (the kernel is visible end to end). Done by the agent on the entrant's behalf (the entrant delegated reviews): the Build With AI: Basics brief at 1440×900 and 390×844; feedback acted on: the phone sheet should open at the passage, not glide there from the top.
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -91,3 +91,10 @@ Reflection:
 Activity mode:
 
 ## Revisions
+
+- Quote check measured on three real rules pages (Build With AI: Basics, IEEE ClimateChain, PayPal AI Hackathon): 83 of 83 quotes matched word for word with the planned normalization, so nothing was loosened. This answers the spec's open uncertainty.
+- The reader's instructions now cap the checklist at 24 items and leave out legal boilerplate — the first reading of the Build With AI rules returned 53 items, most of them fine print that asks nothing of an entrant; real rules pages now give 10 to 24.
+- Pasted text is tidied before reading (no trailing spaces, at most one blank line in a row) — copied pages carried long runs of blank lines that pushed the rules pane apart.
+- Slices 1 and 2 were built in one pass and share one commit — the rules pane was written while the first readings ran.
+- The phone sheet opens straight at the passage instead of gliding from the top — the glide from the top was slow enough that the passage was still off screen when the sheet appeared.
+- A segment where two quotes start together now anchors both — previously only the first item could scroll to it.

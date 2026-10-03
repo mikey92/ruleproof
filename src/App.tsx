@@ -19,12 +19,17 @@ export function App() {
   const contests = useContests()
   const id = /^#\/c\/([0-9a-f]+)$/.exec(hash)?.[1]
 
+  const contest = id ? contests.find((c) => c.id === id) : undefined
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [id])
 
+  useEffect(() => {
+    document.title = contest ? `${contest.reading.contest || 'Contest'} · Ruleproof` : 'Ruleproof'
+  }, [contest?.reading.contest])
+
   if (!id) return <Home />
-  const contest = contests.find((c) => c.id === id)
   if (!contest) {
     return (
       <div className="home">

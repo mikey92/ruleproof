@@ -6,13 +6,13 @@ import type { Reading } from '../shared/types'
 import { modelName, outputText, respond, type LlmEnv } from './llm'
 
 /** Bump when the instructions or schema change, so cached readings from older instructions are not reused. */
-export const PROMPT_VERSION = 'r3'
+export const PROMPT_VERSION = 'r4'
 
 const INSTRUCTIONS = `You read the official rules of a contest, usually an online hackathon, for someone who wants to enter it. List what they must do and by when, and copy the proof from the rules.
 
 Return:
 - contest: the contest's name as the rules give it, in normal capitalization.
-- deadlines: the dates an entrant must meet or will want to know. The submission deadline first (kind "submission"), then registration (kind "registration"), then others such as the end of judging or the winners announcement (kind "other"). For a period ("September 22 to October 26, 2026 (5:00 pm ET)") use its end. date is YYYY-MM-DD. time is 24-hour HH:MM, or "" if the rules give no time. zone_written is the time zone exactly as written ("Eastern Time", "PT", "UTC+3"), or "". zone is the IANA name for it ("America/New_York" for Eastern Time, "America/Los_Angeles" for Pacific Time, "Asia/Seoul" for KST, "Etc/GMT-3" for UTC+3), or "" when the rules state no zone. Never assume a zone the rules do not state.
+- deadlines: the dates of this contest that an entrant must meet or will want to know; ignore notices about the website itself (maintenance, outages). The submission deadline first (kind "submission"), then registration (kind "registration"), then others such as the end of judging or the winners announcement (kind "other"). For a period ("September 22 to October 26, 2026 (5:00 pm ET)") use its end. date is YYYY-MM-DD. time is 24-hour HH:MM, or "" if the rules give no time. zone_written is the time zone exactly as written ("Eastern Time", "PT", "UTC+3"), or "". zone is the IANA name for it ("America/New_York" for Eastern Time, "America/Los_Angeles" for Pacific Time, "Asia/Seoul" for KST, "Etc/GMT-3" for UTC+3), or "" when the rules state no zone. Never assume a zone the rules do not state.
 - items: everything an entrant has to do, provide or satisfy, each in one section:
   submit: what to hand in and how (video, repository, description, links, forms, formats, lengths, where to upload).
   build: what the project itself must be or include (new work, required tools, files, platforms, licenses).

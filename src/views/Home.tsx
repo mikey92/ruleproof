@@ -143,7 +143,7 @@ export function Home() {
                 ? 'Fetching the page…'
                 : seconds < 4
                   ? 'Reading the rules…'
-                  : `Reading the rules and copying the proof… ${seconds}s`}
+                  : `Reading the rules and copying the proof… ${seconds}s (usually 20–40s)`}
             </span>
           ) : (
             <ZonePicker />
@@ -163,6 +163,12 @@ export function Home() {
         <span className="muted">(Build With AI: Basics on Devpost)</span>
       </p>
       <YourContests />
+      <footer className="footer">
+        Your contests and ticks stay in this browser. Rules are sent to the reader only to be read.{' '}
+        <a href="https://github.com/mikey92/ruleproof" target="_blank" rel="noreferrer">
+          Source on GitHub
+        </a>
+      </footer>
     </div>
   )
 }
@@ -186,14 +192,32 @@ function YourContests() {
     <section className="your-contests">
       <h2 className="label">Your contests</h2>
       {rows.length === 0 ? (
-        <p className="empty">Contests you check stay here, in this browser, with their deadlines and your progress.</p>
+        <>
+          <p className="empty">Contests you check stay here, in this browser, with their deadlines and your progress.</p>
+          <ol className="how">
+            <li>
+              <strong>Give it the rules.</strong> Paste the official rules, or a link to the rules page.
+            </li>
+            <li>
+              <strong>An AI reads them</strong> and lists what to submit, what to build, who can enter and the deadline,
+              quoting the rules for every item.
+            </li>
+            <li>
+              <strong>Ruleproof checks every quote</strong> against the rules before it shows the item. Anything it can&rsquo;t
+              find word for word is set apart, never passed off as a requirement.
+            </li>
+          </ol>
+        </>
       ) : (
         <ul>
           {rows.map(({ c, when, left, p }) => (
             <li key={c.id} className="contest-row">
               <a href={`#/c/${c.id}`} className="contest-link">
                 <span className="contest-title">{c.reading.contest || 'Untitled contest'}</span>
-                <span className="contest-due">{when ? describeWhen(when, settings.zone).main : 'No deadline found'}</span>
+                <span className="contest-due">
+                  {when ? describeWhen(when, settings.zone).main : 'No deadline found'}
+                  {when && (when.kind === 'no-time' || when.kind === 'no-zone') && <span className="muted"> · {when.kind === 'no-time' ? 'time' : 'zone'} not stated</span>}
+                </span>
                 {left && <span className={`contest-left${left.urgent ? ' urgent' : ''}`}>{left.text}</span>}
                 <span className="contest-progress">
                   <span className="bar">

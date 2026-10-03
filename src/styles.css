@@ -830,3 +830,126 @@ button.proof:hover q {
 .muted {
   color: var(--muted);
 }
+
+/* Finishing */
+a.wordmark {
+  text-decoration: none;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.how {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: how;
+  display: grid;
+  gap: 12px;
+}
+
+.how li {
+  counter-increment: how;
+  position: relative;
+  padding-left: 36px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.how li::before {
+  content: counter(how);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--ink);
+  border-radius: 3px;
+  font: 500 12px/1 var(--mono);
+  color: var(--ink);
+}
+
+.how strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.footer {
+  margin-top: 56px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font: 13px/1.6 var(--mono);
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .home,
+  .brief {
+    padding: 0 16px;
+  }
+
+  .hero {
+    padding: 32px 0 20px;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .input-card {
+    padding: 16px;
+  }
+
+  textarea {
+    min-height: 180px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions .primary {
+    width: 100%;
+  }
+
+  .contest-name {
+    font-size: 24px;
+  }
+
+  .due {
+    padding: 16px;
+  }
+
+  .due-time {
+    font-size: 25px;
+  }
+
+  .contest-link {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contest-title,
+  .contest-due,
+  .contest-left,
+  .contest-progress {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .other-label {
+    min-width: 0;
+  }
+
+  .zone-picker select {
+    max-width: 11em;
+  }
+}

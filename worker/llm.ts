@@ -42,9 +42,37 @@ async function post(url: string, headers: Record<string, string>, body: unknown,
   return data.output ?? []
 }
 
-/** One Responses call; returns its output items. */
-export async function respond(env: LlmEnv, body: Record<string, unknown>, timeoutMs = 90_000): Promise<ResponseItem[]> {
-  const signal = AbortSignal.timeout(timeoutMs)
+/** A reading usually comes back in 15 to 45 seconds, but now and then one takes far longer. When an answer is that
+ *  late, the same request goes out again and whichever answer arrives first is used. */
+const HEDGE_AFTER_MS = 50_000
+
+/** One Responses call, sent a second time if the first is slow; returns the first answer's output items. */
+export async function respond(env: LlmEnv, body: Record<string, unknown>, timeoutMs = 110_000): Promise<ResponseItem[]> {
+  const deadline = AbortSignal.timeout(timeoutMs)
+  const calls: AbortController[] = []
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await new Promise<ResponseItem[]>((resolve, reject) => {
+      let running = 0
+      const start = () => {
+        const c = new AbortController()
+        calls.push(c)
+        running++
+        once(env, body, AbortSignal.any([deadline, c.signal])).then(resolve, (e) => {
+          // A failure counts only when no other call is still on its way.
+          if (--running === 0) reject(e)
+        })
+      }
+      start()
+      timer = setTimeout(start, HEDGE_AFTER_MS)
+    })
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+    for (const c of calls) c.abort()
+  }
+}
+
+async function once(env: LlmEnv, body: Record<string, unknown>, signal: AbortSignal): Promise<ResponseItem[]> {
   if (env.LLM_RELAY_URL && env.LLM_RELAY_KEY) {
     // The plan's endpoint only streams; the relay reads the stream and returns the finished answer (x-relay-collect).
     return post(

@@ -59,7 +59,7 @@ Build mode: fast
   Learner check: Press "Try it with this hackathon's rules" and get a brief without pasting anything.
   Commit: `Read rules from a page link`
 
-- [ ] **6. Every state looks finished**
+- [x] **6. Every state looks finished**
   Becomes usable: The full look and feel (Plex fonts, palette, spacing), the first-use, reading, offline, rate-limited and nothing-found states, the reading cache, and a phone layout.
   Why now: Polish lands last, once every behavior it dresses exists; the cache makes the example instant for reviewers.
   PRD ref: `prd.md > Look and Feel`, `prd.md > States and Boundaries`
@@ -102,3 +102,6 @@ Activity mode:
 - The zone setting is saved in the browser already in slice 3 (`src/store.ts`) — switching zones and coming back should not reset it; slice 4 adds contests to the same store.
 - `/api/fetch` passes the page body straight through instead of counting bytes as they stream — on the Workers free plan every stream chunk the Worker touches costs CPU time, and the 10 ms budget matters more than a size cap on pages that send no length.
 - List items that wrap a paragraph (Devpost's rules do) left their "- " on a line of its own; the extractor joins them back to the item's text.
+- A slow reading is sent a second time after 50 seconds and the first answer wins (`worker/llm.ts`) — one reading of the example took over 40 seconds, and a stuck call would otherwise leave the reader waiting for the full timeout.
+- The reader now ignores website notices when listing dates (instructions r4) — Devpost's maintenance banner came through the page text and showed up as a contest date. Re-measured after the change: 83 of 83 quotes still matched on the three rules pages.
+- The home page shows three short lines on how Ruleproof works until the first contest is saved, and a footer saying what stays in the browser — the PRD's first-use state asked for it, and it states the proof promise before anyone pastes anything.

@@ -49,7 +49,7 @@ Build mode: fast
   Learner check: Tick two items, reload, go home, and see the contest listed with its progress.
   Commit: `Save ticks and list saved contests`
 
-- [ ] **5. Paste a link instead of the text**
+- [x] **5. Paste a link instead of the text**
   Becomes usable: A rules page link (and the "Try it with this hackathon's rules" example) produces the same brief as pasting its text.
   Why now: Removes the copy-paste chore and powers the example; it depends on the whole reading path already working.
   PRD ref: `prd.md > Reading the Rules` (Link, Example)
@@ -100,3 +100,5 @@ Activity mode:
 - A segment where two quotes start together now anchors both — previously only the first item could scroll to it.
 - Dates and judging criteria are highlighted in the rules too, so marks are keyed by kind ("i3", "d0", "j1") instead of item number — the deadline's own quote is proof and should be one click from its sentence like any item. The "How it's judged" group landed in this slice for the same reason.
 - The zone setting is saved in the browser already in slice 3 (`src/store.ts`) — switching zones and coming back should not reset it; slice 4 adds contests to the same store.
+- `/api/fetch` passes the page body straight through instead of counting bytes as they stream — on the Workers free plan every stream chunk the Worker touches costs CPU time, and the 10 ms budget matters more than a size cap on pages that send no length.
+- List items that wrap a paragraph (Devpost's rules do) left their "- " on a line of its own; the extractor joins them back to the item's text.

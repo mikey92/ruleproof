@@ -762,3 +762,71 @@ button.proof:hover q {
 .lost {
   margin-top: 40px;
 }
+
+/* Paste or link */
+.modes {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modes button {
+  padding: 8px 14px 9px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font: 500 12px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.modes button.on {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.modes button:first-child {
+  padding-left: 0;
+}
+
+.link-input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: #fdfcf9;
+  font: 15px/1.4 var(--mono);
+}
+
+.link-input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.example {
+  margin: 14px 2px 0;
+  font-size: 15px;
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--proof-strong);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.text-button:hover:not(:disabled) {
+  background: var(--proof-soft);
+}
+
+.muted {
+  color: var(--muted);
+}

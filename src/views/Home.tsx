@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { countdown, resolve, target } from '../../shared/time'
 import { tidyRules } from '../../shared/text'
 import { MAX_RULES_CHARS, MIN_RULES_CHARS } from '../../shared/types'
-import { ApiError, readRules } from '../api'
+import { ApiError, fetchPage, readRules } from '../api'
+import { htmlToRulesText } from '../extract'
 import { go } from '../nav'
 import { progress } from '../progress'
 import { deleteContest, getContest, putContest, useContests, useSettings } from '../store'
@@ -17,9 +18,16 @@ async function contestId(text: string): Promise<string> {
     .join('')
 }
 
+/** This hackathon's own official rules: the example anyone can try without pasting anything. */
+export const EXAMPLE_URL = 'https://learn-ai-basics.devpost.com/rules'
+
+type Mode = 'paste' | 'link'
+
 export function Home() {
+  const [mode, setMode] = useState<Mode>('paste')
   const [text, setText] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [link, setLink] = useState('')
+  const [busy, setBusy] = useState<'' | 'fetching' | 'reading'>('')
   const [error, setError] = useState('')
   const [seconds, setSeconds] = useState(0)
 
@@ -28,25 +36,37 @@ export function Home() {
     setSeconds(0)
     const timer = setInterval(() => setSeconds((s) => s + 1), 1000)
     return () => clearInterval(timer)
-  }, [busy])
+  }, [busy === ''])
 
-  async function check() {
+  async function check(how: Mode, value: string) {
     if (busy) return
-    const rules = tidyRules(text)
-    if (rules.length < MIN_RULES_CHARS) return setError(new ApiError('too_short').message)
-    if (rules.length > MAX_RULES_CHARS) return setError(new ApiError('too_long').message)
     setError('')
-    const id = await contestId(rules)
-    // The same rules again: open the saved contest, ticks and all.
-    if (getContest(id)) return go(`#/c/${id}`)
-    setBusy(true)
+    let rules = tidyRules(value)
+    let url: string | undefined
     try {
+      if (how === 'link') {
+        if (!value.trim()) return setError(new ApiError('bad_url').message)
+        setBusy('fetching')
+        const page = await fetchPage(value.trim())
+        rules = htmlToRulesText(page.html)
+        url = page.finalUrl
+        if (rules.length < MIN_RULES_CHARS) {
+          setMode('paste')
+          throw new ApiError('fetch_failed')
+        }
+      }
+      if (rules.length < MIN_RULES_CHARS) throw new ApiError('too_short')
+      if (rules.length > MAX_RULES_CHARS) throw new ApiError('too_long')
+      const id = await contestId(rules)
+      // The same rules again: open the saved contest, ticks and all.
+      if (getContest(id)) return go(`#/c/${id}`)
+      setBusy('reading')
       const { reading, model } = await readRules(rules)
       if (!reading.items.length) throw new ApiError('nothing_found')
       putContest({
         id,
         addedAt: new Date().toISOString(),
-        source: { kind: 'paste' },
+        source: url ? { kind: 'link', url } : { kind: 'paste' },
         text: rules,
         reading,
         model,
@@ -55,10 +75,17 @@ export function Home() {
       })
       go(`#/c/${id}`)
     } catch (e) {
+      if (e instanceof ApiError && e.code === 'fetch_failed') setMode('paste')
       setError(e instanceof ApiError ? e.message : new ApiError('reader_offline').message)
     } finally {
-      setBusy(false)
+      setBusy('')
     }
+  }
+
+  function tryExample() {
+    setMode('link')
+    setLink(EXAMPLE_URL)
+    void check('link', EXAMPLE_URL)
   }
 
   return (
@@ -76,24 +103,47 @@ export function Home() {
         </p>
       </section>
       <section className="card input-card">
-        <label htmlFor="rules" className="label">
-          Paste the rules
-        </label>
-        <textarea
-          id="rules"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Copy everything on the contest's official rules page and paste it here."
-          disabled={busy}
-          spellCheck={false}
-        />
+        <div className="modes" role="tablist" aria-label="How to give Ruleproof the rules">
+          <button role="tab" aria-selected={mode === 'paste'} className={mode === 'paste' ? 'on' : ''} onClick={() => setMode('paste')} disabled={Boolean(busy)}>
+            Paste the rules
+          </button>
+          <button role="tab" aria-selected={mode === 'link'} className={mode === 'link' ? 'on' : ''} onClick={() => setMode('link')} disabled={Boolean(busy)}>
+            Rules page link
+          </button>
+        </div>
+        {mode === 'paste' ? (
+          <textarea
+            aria-label="The rules"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Copy everything on the contest's official rules page and paste it here."
+            disabled={Boolean(busy)}
+            spellCheck={false}
+          />
+        ) : (
+          <input
+            type="url"
+            className="link-input"
+            aria-label="Rules page link"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && check('link', link)}
+            placeholder="https://contest.example.com/rules"
+            disabled={Boolean(busy)}
+            spellCheck={false}
+          />
+        )}
         <div className="actions">
-          <button className="primary" onClick={check} disabled={busy}>
-            {busy ? 'Reading…' : 'Check the rules'}
+          <button className="primary" onClick={() => check(mode, mode === 'paste' ? text : link)} disabled={Boolean(busy)}>
+            {busy ? 'Working…' : 'Check the rules'}
           </button>
           {busy ? (
             <span className="progress" role="status">
-              {seconds < 4 ? 'Reading the rules…' : `Reading the rules and copying the proof… ${seconds}s`}
+              {busy === 'fetching'
+                ? 'Fetching the page…'
+                : seconds < 4
+                  ? 'Reading the rules…'
+                  : `Reading the rules and copying the proof… ${seconds}s`}
             </span>
           ) : (
             <ZonePicker />
@@ -105,6 +155,13 @@ export function Home() {
           </p>
         )}
       </section>
+      <p className="example">
+        No rules handy?{' '}
+        <button className="text-button" onClick={tryExample} disabled={Boolean(busy)}>
+          Try it with this hackathon&rsquo;s rules
+        </button>{' '}
+        <span className="muted">(Build With AI: Basics on Devpost)</span>
+      </p>
       <YourContests />
     </div>
   )

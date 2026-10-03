@@ -10,7 +10,10 @@
   // Readings by fingerprint of the rules text, so the same rules are read by the AI once.
   "kv_namespaces": [{ "binding": "READINGS", "id": "ruleproof-readings-local" }],
   // Per visitor IP: keeps one browser from spending the reader's capacity.
-  "ratelimits": [{ "name": "READ_LIMIT", "namespace_id": "4201", "simple": { "limit": 6, "period": 60 } }],
+  "ratelimits": [
+    { "name": "READ_LIMIT", "namespace_id": "4201", "simple": { "limit": 6, "period": 60 } },
+    { "name": "FETCH_LIMIT", "namespace_id": "4202", "simple": { "limit": 20, "period": 60 } }
+  ],
   "observability": { "enabled": true }
   // Secrets: LLM_RELAY_URL and LLM_RELAY_KEY, or OPENAI_API_KEY. Optional var: LLM_MODEL.
 }

@@ -8,6 +8,8 @@ const MESSAGES: Record<string, string> = {
   reader_offline: 'The rules reader is offline right now. Try again in a minute.',
   rate_limited: 'Too many readings in a row. Wait a minute and try again.',
   nothing_found: 'No requirements found. Is this the official rules page?',
+  bad_url: "That doesn't look like a web page address. It should start with https://",
+  fetch_failed: "Couldn't read that page. Copy the rules text and paste it instead.",
 }
 
 export class ApiError extends Error {
@@ -30,4 +32,19 @@ export async function readRules(text: string): Promise<ReadResult> {
   const data = (await res.json().catch(() => ({}))) as Partial<ReadResult> & { error?: string }
   if (!res.ok || !data.reading) throw new ApiError(data.error ?? 'reader_offline')
   return data as ReadResult
+}
+
+/** The HTML of a rules page, fetched by the server (browsers may not read other sites directly). */
+export async function fetchPage(url: string): Promise<{ html: string; finalUrl: string }> {
+  let res: Response
+  try {
+    res = await fetch(`/api/fetch?url=${encodeURIComponent(url)}`)
+  } catch {
+    throw new ApiError('fetch_failed')
+  }
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string }
+    throw new ApiError(data.error === 'bad_url' || data.error === 'rate_limited' ? data.error : 'fetch_failed')
+  }
+  return { html: await res.text(), finalUrl: res.headers.get('x-final-url') || url }
 }

@@ -1,10 +1,22 @@
 import { describe, expect, it } from 'vitest'
-import { tidyRules } from '../shared/text'
+import { contestName, tidyRules } from '../shared/text'
 import { checkAll, indexText, locate } from '../shared/verify'
 
 describe('tidyRules', () => {
   it('keeps at most one blank line and drops trailing spaces', () => {
     expect(tidyRules('  A  \r\n\r\n\r\n\r\nB\t\n\n\nC  ')).toBe('A\n\nB\n\nC')
+  })
+})
+
+describe('contestName', () => {
+  it('turns names set in capitals into title case, keeping short acronyms', () => {
+    expect(contestName('BUILD WITH AI HACKATHON')).toBe('Build with AI Hackathon')
+    expect(contestName('THE API CHALLENGE OF THE YEAR')).toBe('The API Challenge of the Year')
+  })
+
+  it('leaves names that already mix cases alone', () => {
+    expect(contestName('IEEE ClimateChain Global Hackathon')).toBe('IEEE ClimateChain Global Hackathon')
+    expect(contestName('  ')).toBe('Untitled contest')
   })
 })
 

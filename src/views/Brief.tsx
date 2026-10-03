@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { contestName } from '../../shared/text'
 import { SECTIONS, type Contest, type Criterion, type Item } from '../../shared/types'
 import { checkAll, indexText, type Checked } from '../../shared/verify'
 import { progress } from '../progress'
@@ -69,7 +70,7 @@ export function Brief({ contest }: { contest: Contest }) {
       </header>
       <div className="brief-grid">
         <main className="brief-main">
-          <h1 className="contest-name">{reading.contest || 'Untitled contest'}</h1>
+          <h1 className="contest-name">{contestName(reading.contest)}</h1>
           <DeadlineHeader contest={contest} zone={settings.zone} isProven={(k) => provenKeys.has(k)} onSelect={select} />
           <div className="progress-line" aria-live="polite">
             <span className="bar">

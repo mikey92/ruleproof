@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { contestName } from '../shared/text'
 import { useContests } from './store'
 import { Brief } from './views/Brief'
 import { Home } from './views/Home'
@@ -26,7 +27,7 @@ export function App() {
   }, [id])
 
   useEffect(() => {
-    document.title = contest ? `${contest.reading.contest || 'Contest'} · Ruleproof` : 'Ruleproof'
+    document.title = contest ? `${contestName(contest.reading.contest)} · Ruleproof` : 'Ruleproof'
   }, [contest?.reading.contest])
 
   if (!id) return <Home />

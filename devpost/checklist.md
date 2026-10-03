@@ -72,23 +72,25 @@ Build mode: fast
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 2 (the kernel is visible end to end). Done by the agent on the entrant's behalf (the entrant delegated reviews): the Build With AI: Basics brief at 1440×900 and 390×844; feedback acted on: the phone sheet should open at the passage, not glide there from the top.
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed — done by the agent on the entrant's behalf (the entrant delegated reviews): the whole journey on the local build and on the live deployment, plus two rules pages never seen before (Nebius x NVIDIA, YouCam) through the link option.
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Ignore website notices when listing dates — Devpost's maintenance banner showed up as a contest date. Fixed in the reader's instructions (r4); re-measured 83 of 83 quotes.
+- [x] Show contest names set in capitals in title case — one live reading named the contest "BUILD WITH AI HACKATHON". Fixed in `contestName` (`shared/text.ts`) with tests, applied wherever a name is shown.
+- [x] Final review complete — feedback resolved and learner confirms ready to ship. The entrant delegated the review and the go-ahead; recorded here as the agent's call on their behalf. New pages read cleanly: Nebius 25 of 25 items and YouCam 26 of 26 items found word for word, deadlines shown in Korea time as expected.
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence:
-Route and stops:
-Edit outcome:
-Reflection:
-Activity mode:
+Activity and evidence: Brief evidence-based recap of the spec's one real uncertainty (would the AI copy quotes exactly enough for strict matching?) — answered by measurement: 83 of 83 quotes on three rules pages, 51 of 51 checklist items on two new pages; see Revisions and `tests/verify.test.ts`.
+Route and stops: Reference route only, not toured interactively: `shared/verify.ts` (`locate`), `src/views/Brief.tsx` (`select`, `ItemRow`, `Proof`), `src/views/RulesPane.tsx` (`segments`, the scroll effect).
+Edit outcome: Not applicable — the entrant delegated the build and did not take a hands-on tour.
+Reflection: Not offered — the entrant asked for the work to be done without check-ins.
+Activity mode: Recap. App map checked with scripts disabled at 1000px wide; every path and symbol it names was found in the code.
 
 ## Revisions
 

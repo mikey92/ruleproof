@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { countdown, resolve, target } from '../../shared/time'
-import { tidyRules } from '../../shared/text'
+import { contestName, tidyRules } from '../../shared/text'
 import { MAX_RULES_CHARS, MIN_RULES_CHARS } from '../../shared/types'
 import { ApiError, fetchPage, readRules } from '../api'
 import { htmlToRulesText } from '../extract'
@@ -213,7 +213,7 @@ function YourContests() {
           {rows.map(({ c, when, left, p }) => (
             <li key={c.id} className="contest-row">
               <a href={`#/c/${c.id}`} className="contest-link">
-                <span className="contest-title">{c.reading.contest || 'Untitled contest'}</span>
+                <span className="contest-title">{contestName(c.reading.contest)}</span>
                 <span className="contest-due">
                   {when ? describeWhen(when, settings.zone).main : 'No deadline found'}
                   {when && (when.kind === 'no-time' || when.kind === 'no-zone') && <span className="muted"> · {when.kind === 'no-time' ? 'time' : 'zone'} not stated</span>}
@@ -228,8 +228,8 @@ function YourContests() {
               </a>
               <button
                 className="delete"
-                aria-label={`Delete ${c.reading.contest}`}
-                onClick={() => window.confirm(`Delete ${c.reading.contest || 'this contest'} and its ticks from this browser?`) && deleteContest(c.id)}
+                aria-label={`Delete ${contestName(c.reading.contest)}`}
+                onClick={() => window.confirm(`Delete ${contestName(c.reading.contest)} and its ticks from this browser?`) && deleteContest(c.id)}
               >
                 Delete
               </button>

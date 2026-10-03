@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
 import { deadlineIcs } from '../../shared/ics'
 import { countdown, formatDate, formatInZone, resolve, target, type When } from '../../shared/time'
+import { contestName } from '../../shared/text'
 import type { Contest } from '../../shared/types'
 import { ZonePicker } from './ZonePicker'
 
@@ -86,8 +87,8 @@ export function DeadlineHeader({
   function addToCalendar() {
     if (!to) return
     download(
-      `${slug(contest.reading.contest)}-deadline.ics`,
-      deadlineIcs({ uid: `${contest.id}-${main}`, contest: contest.reading.contest, deadline: to, quote: d.quote, url: contest.source.url, now: DateTime.now() }),
+      `${slug(contestName(contest.reading.contest))}-deadline.ics`,
+      deadlineIcs({ uid: `${contest.id}-${main}`, contest: contestName(contest.reading.contest), deadline: to, quote: d.quote, url: contest.source.url, now: DateTime.now() }),
     )
   }
 

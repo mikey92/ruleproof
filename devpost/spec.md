@@ -47,6 +47,9 @@ PRD ref: `prd.md > The Core Journey`.
 - **Tests**: `npm test` (Vitest) and `npm run typecheck`.
 - **Live app (optional deployment, chosen)**: https://ruleproof.mikey9220.workers.dev, on the Workers free plan. Deploy with `npx wrangler kv namespace create READINGS` once (its id goes in `wrangler.jsonc`), `npx wrangler secret put LLM_RELAY_URL` and `LLM_RELAY_KEY` (or `OPENAI_API_KEY`), then `npm run deploy`.
 - **Demo recording**: the live app in a clean browser window at 1440×900. Show the example (this hackathon's rules link), the brief, clicking items into the rules, ticking and reloading, the deadline in two zones, and the calendar file.
+- **Public repository**: https://github.com/mikey92/ruleproof (MIT).
+- **Demo video**: https://youtu.be/BnzQTBH97G0 (public on YouTube, about 2 minutes).
+- **Devpost submission**: https://devpost.com/software/ruleproof-9iw4ac
 
 ## Look and Feel
 From `prd.md > Look and Feel` and `scope.md > Inspiration & Identity`, as CSS custom properties in `src/styles.css`:

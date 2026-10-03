@@ -4,6 +4,8 @@
 
 Live app: **https://ruleproof.mikey9220.workers.dev** (no sign-up; press "Try it with this hackathon's rules")
 
+Demo video (2 minutes): https://youtu.be/BnzQTBH97G0 · Devpost: https://devpost.com/software/ruleproof-9iw4ac
+
 ## Why proof matters
 
 An AI reads the rules, and it is good at finding requirements in 500 lines of legal text. It is not trusted on its own. Every item it returns must quote the rules, and plain code (`shared/verify.ts`) looks for each quote in the rules text before the item counts:

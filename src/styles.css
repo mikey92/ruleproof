@@ -440,7 +440,7 @@ button.proof:hover q {
 }
 
 .due-time {
-  font: 500 34px/1.15 var(--mono);
+  font: 500 clamp(24px, 2.35vw, 34px)/1.15 var(--mono);
   letter-spacing: -0.02em;
   margin: 10px 0 4px;
 }
